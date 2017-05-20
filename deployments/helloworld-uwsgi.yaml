@@ -1,0 +1,60 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: helloworld-uwsgi
+  name: helloworld-uwsgi
+spec:
+  template:
+    metadata:
+      labels:
+        app: helloworld-uwsgi
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.13.0
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit"]
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 128Mi
+            requests:
+              cpu: 500m
+              memory: 64Mi
+          volumeMounts:
+            - name: helloworld-run
+              mountPath: /var/run/helloworld
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d
+        - name: helloworld
+          image: gcr.io/hightowerlabs/helloworld-python:0.0.2
+          workingDir: /app
+          command: ["/usr/local/bin/uwsgi"]
+          args:
+            - "--die-on-term"
+            - "--manage-script-name"
+            - "--mount=/=app:app"
+            - "--socket=/var/run/helloworld/uwsgi.sock"
+            - "--chmod-socket=666"
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
+          volumeMounts:
+            - name: helloworld-run
+              mountPath: /var/run/helloworld
+      volumes:
+        - name: helloworld-run
+          emptyDir: {}
+        - name: nginx-conf
+          configMap:
+            name: helloworld
