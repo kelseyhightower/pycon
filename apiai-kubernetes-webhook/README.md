@@ -3,11 +3,11 @@
 ## Creating the Container Images
 
 ```
-docker build -t gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.3.0 .
+docker build -t gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.3.1 .
 ```
 
 ```
-gcloud docker -- push gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.3.0
+gcloud docker -- push gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.3.1
 ```
 
 ## Secrets and Configmaps
@@ -72,8 +72,18 @@ gcloud beta iam service-accounts keys create \
   service-account.json
 ```
 
+## Deploy the API.AI Kubernetes Webhook
+
 ```
 kubectl -n kube-system \
   create secret generic apiai-kubernetes-webhook-service-account \
   --from-file $HOME/service-account.json
+```
+
+```
+kubectl -n kube-system create -f services/apiai-kubernetes-webhook.yaml
+```
+
+```
+kubectl -n kube-system create -f deployments/apiai-kubernetes-webhook.yaml
 ```

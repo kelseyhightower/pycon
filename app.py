@@ -20,7 +20,7 @@ def hello():
 
 @app.route("/version")
 def version():
-    return "helloworld 1.0.0\n"
+    return "helloworld 2.0.0\n"
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
