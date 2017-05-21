@@ -28,9 +28,16 @@ kubectl create -f deployments/helloworld.yaml
 kubectl create -f services/helloworld.yaml
 ```
 
-## Deploy the Hello World Pod
+## Deploy the Hello World uWSGI Pod
 
 ```
-kubectl create configmap helloworld \
-  --from-file nginx/helloworld.conf
+kubectl create -f services/helloworld-uwsgi.yaml
+```
+
+```
+kubectl create configmap helloworld --from-file nginx/helloworld.conf
+```
+
+```
+kubectl create -f deployments/helloworld-uwsgi.yaml
 ```

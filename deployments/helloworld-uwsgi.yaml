@@ -33,7 +33,7 @@ spec:
             - name: nginx-conf
               mountPath: /etc/nginx/conf.d
         - name: helloworld
-          image: gcr.io/hightowerlabs/helloworld-python:0.0.2
+          image: gcr.io/hightowerlabs/helloworld:1.0.0
           workingDir: /app
           command: ["/usr/local/bin/uwsgi"]
           args:
