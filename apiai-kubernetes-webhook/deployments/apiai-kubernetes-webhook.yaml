@@ -36,7 +36,7 @@ spec:
             - name: tls-certs
               mountPath: /etc/tls
         - name: apiai-kubernetes-webhook
-          image: gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.2.0
+          image: gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.3.0
           workingDir: /app
           command: ["/usr/local/bin/uwsgi"]
           args:
@@ -52,7 +52,10 @@ spec:
                   name: apiai-kubernetes-webhook
                   key: cluster-id
             - name: NAMESPACE
-              value: default
+              valueFrom:
+                configMapKeyRef:
+                  name: apiai-kubernetes-webhook
+                  key: namespace
             - name: PROJECT_ID
               valueFrom:
                 configMapKeyRef:
@@ -88,7 +91,7 @@ spec:
             name: apiai-kubernetes-webhook
         - name: tls-certs
           secret:
-            secretName: apiai-kubernetes-webhook
+            secretName: apiai-kubernetes-webhook-tls
         - name: service-account
           secret:
             secretName: apiai-kubernetes-webhook-service-account

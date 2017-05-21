@@ -1,25 +1,45 @@
 # API.AI Kubernetes Webhook
 
+## Creating the Container Images
+
 ```
-docker build -t gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.0.1 .
+docker build -t gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.3.0 .
 ```
 
 ```
-gcloud docker -- push gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.0.1
+gcloud docker -- push gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.3.0
 ```
+
+## Secrets and Configmaps
+
+The API.AI Kubernetes webhook requires a valid TLS certificate. Use certbot to create one then store the certs in the `apiai-kubernetes-webhook-tls` secret
 
 ```
 kubectl -n kube-system \
-  create secret tls apiai-kubernetes-webhook \
+  create secret tls apiai-kubernetes-webhook-tls \
   --key=${HOME}/apiai-kubernetes-webhook-hightowerlabs-com.key \
   --cert=${HOME}/apiai-kubernetes-webhook-hightowerlabs-com.pem
+```
+
+export BASIC_AUTH_PASSWORD=$(openssl rand -hex 16)
+
+```
+kubectl -n kube-system \
+  create secret generic apiai-kubernetes-webhook \
+  --from-literal "basic-auth-username=apiai" \
+  --from-literal "basic-auth-password=${BASIC_AUTH_PASSWORD}"
 ```
 
 ```
 kubectl -n kube-system \
   create configmap apiai-kubernetes-webhook \
-  --from-file nginx/apiai-kubernetes-webhook.conf
+  --from-file nginx/apiai-kubernetes-webhook.conf \
+  --from-literal "cluster-id=pycon" \
+  --from-literal "project-id=hightowerlabs" \
+  --from-literal "namespace=default"
 ```
+
+## Create GCP Service Account
 
 ```
 export PROJECT_ID=$(gcloud config get-value core/project)
@@ -53,6 +73,7 @@ gcloud beta iam service-accounts keys create \
 ```
 
 ```
-kubectl create secret generic apiai-kubernetes-webhook-service-account \
-  --from-file service-account.json -n kube-system
+kubectl -n kube-system \
+  create secret generic apiai-kubernetes-webhook-service-account \
+  --from-file $HOME/service-account.json
 ```
