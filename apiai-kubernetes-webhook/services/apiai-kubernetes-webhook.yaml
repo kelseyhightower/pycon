@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: apiai-kubernetes-webhook
+  name: apiai-kubernetes-webhook
+  namespace: kube-system
+spec:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 443 
+  selector:
+    app: apiai-kubernetes-webhook
+  type: LoadBalancer

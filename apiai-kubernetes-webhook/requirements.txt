@@ -1,0 +1,5 @@
+Flask==0.12
+uwsgi==2.0.15
+google-api-python-client
+apiai==1.2.3
+kubernetes==2.0.0

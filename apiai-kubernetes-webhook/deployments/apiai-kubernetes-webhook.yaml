@@ -1,0 +1,71 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: apiai-kubernetes-webhook
+  name: apiai-kubernetes-webhook
+  namespace: kube-system
+spec:
+  template:
+    metadata:
+      labels:
+        app: apiai-kubernetes-webhook
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.13.0
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/usr/sbin/nginx","-s","quit"]
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 128Mi
+            requests:
+              cpu: 500m
+              memory: 64Mi
+          volumeMounts:
+            - name: apiai-kubernetes-webhook-run
+              mountPath: /var/run/apiai-kubernetes-webhook
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d
+            - name: tls-certs
+              mountPath: /etc/tls
+        - name: apiai-kubernetes-webhook
+          image: gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.1.0
+          workingDir: /app
+          command: ["/usr/local/bin/uwsgi"]
+          args:
+            - "--die-on-term"
+            - "--manage-script-name"
+            - "--mount=/=app:app"
+            - "--socket=/var/run/apiai-kubernetes-webhook/uwsgi.sock"
+            - "--chmod-socket=666"
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
+          volumeMounts:
+            - name: apiai-kubernetes-webhook-run
+              mountPath: /var/run/apiai-kubernetes-webhook
+            - name: service-account
+              mountPath: /etc/apiai-kubernetes-webhook
+      volumes:
+        - name: apiai-kubernetes-webhook-run
+          emptyDir: {}
+        - name: nginx-conf
+          configMap:
+            name: apiai-kubernetes-webhook
+        - name: tls-certs
+          secret:
+            secretName: apiai-kubernetes-webhook
+        - name: service-account
+          secret:
+            secretName: apiai-kubernetes-webhook-service-account
