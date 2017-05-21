@@ -36,7 +36,7 @@ spec:
             - name: tls-certs
               mountPath: /etc/tls
         - name: apiai-kubernetes-webhook
-          image: gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.1.3
+          image: gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.2.0
           workingDir: /app
           command: ["/usr/local/bin/uwsgi"]
           args:
@@ -45,6 +45,29 @@ spec:
             - "--mount=/=app:app"
             - "--socket=/var/run/apiai-kubernetes-webhook/uwsgi.sock"
             - "--chmod-socket=666"
+          env:
+            - name: CLUSTER_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: apiai-kubernetes-webhook
+                  key: cluster-id
+            - name: NAMESPACE
+              value: default
+            - name: PROJECT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: apiai-kubernetes-webhook
+                  key: project-id
+            - name: BASIC_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: apiai-kubernetes-webhook
+                  key: basic-auth-username
+            - name: BASIC_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: apiai-kubernetes-webhook
+                  key: basic-auth-password
           resources:
             limits:
               cpu: 1000m
