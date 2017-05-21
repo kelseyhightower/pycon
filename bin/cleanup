@@ -1,0 +1,9 @@
+#!/bin/bash
+
+kubectl delete deployment helloworld helloworld-uwsgi
+kubectl delete svc helloworld
+
+kubectl -n kube-system delete deployment apiai-kubernetes-webhook
+kubectl -n kube-system delete svc apiai-kubernetes-webhook
+kubectl -n kube-system delete configmap apiai-kubernetes-webhook
+kubectl -n kube-system delete secret apiai-kubernetes-webhook apiai-kubernetes-webhook-service-account

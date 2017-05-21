@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   labels:
@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
         - name: helloworld
-          image: gcr.io/hightowerlabs/helloworld-python:0.0.1
+          image: gcr.io/hightowerlabs/helloworld:1.0.0
           ports:
             - containerPort: 5000
               protocol: TCP
