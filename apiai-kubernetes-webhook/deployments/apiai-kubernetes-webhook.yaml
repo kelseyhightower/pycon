@@ -36,7 +36,7 @@ spec:
             - name: tls-certs
               mountPath: /etc/tls
         - name: apiai-kubernetes-webhook
-          image: gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.1.0
+          image: gcr.io/hightowerlabs/apiai-kubernetes-webhook:0.1.3
           workingDir: /app
           command: ["/usr/local/bin/uwsgi"]
           args:

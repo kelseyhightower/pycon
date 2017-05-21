@@ -122,9 +122,63 @@ def create_deployment(parameters):
     }
 
 def scale_deployment(parameters):
-    return
+    deployment_name = parameters['deployment_name']
+    replica_count = int(parameters['replica_count'])
+
+    body = kubernetes.client.AppsV1beta1Deployment()
+    body.spec = {
+       'replicas': replica_count
+    }
+
+    speech = ""
+
+    try:
+        api_response = api_instance.patch_namespaced_deployment(deployment_name, namespace, body)
+        speech = "Scaling the {} deployment to {}".format(deployment_name, replica_count)
+    except ApiException as e:
+        print("Exception when calling AppsV1beta1Api->patch_namespaced_deployment: %s\n" % e)
+        speech = "There was an error while scaling the {} deployment".format(deployment_name)
+
+    return {
+        "speech": speech,
+        "displayText": speech,
+        "source": "kubernetes-webhook"
+    }
+
+
 def update_deployment(parameters):
-    return
+    deployment_name = parameters['deployment_name']
+    image_tag = parameters['image_tag']
+
+    body = kubernetes.client.AppsV1beta1Deployment()
+    body.spec = {
+        'template': {
+           'spec': {
+               'containers': [
+                   {
+                      'name': deployment_name,
+                      'image': "gcr.io/hightowerlabs/{}:{}".format(deployment_name, image_tag)
+                   }
+               ]
+           }
+        }
+    }
+
+    speech = ""
+
+    try:
+        api_response = api_instance.patch_namespaced_deployment(deployment_name, namespace, body)
+        speech = "Updating the {} deployment to version {}".format(deployment_name, image_tag)
+    except ApiException as e:
+        print("Exception when calling AppsV1beta1Api->patch_namespaced_deployment: %s\n" % e)
+        speech = "There was an error updating the {} deployment".format(deployment_name)
+
+    return {
+        "speech": speech,
+        "displayText": speech,
+        "source": "kubernetes-webhook"
+    }
+
 
 def get_cluster_status():
     cluster_request = container_service.projects().zones().clusters().get(projectId=project_id, zone=zone, clusterId=cluster_id)
