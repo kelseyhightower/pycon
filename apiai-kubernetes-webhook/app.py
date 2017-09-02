@@ -132,6 +132,7 @@ def create_deployment(parameters):
         speech = "Deploying {} {} into the {} cluster.".format(image_name, image_tag, cluster_id)
     except ApiException as e:
         print("Exception when calling AppsV1beta1Api->create_namespaced_deployment: %s\n" % e)
+        deployment_name = parameters.get("deployment_name", "")
         speech = "There was an error while creating the {} deployment".format(deployment_name)
 
     return {
